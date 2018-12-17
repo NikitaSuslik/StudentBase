@@ -1,6 +1,12 @@
 #ifndef STUDENTLIST_H
 #define STUDENTLIST_H
+
+#include <iostream>
+
+
 #include "basestudent.h"
+
+using namespace std;
 
 struct StudentNode {
 public:
@@ -21,7 +27,8 @@ public:
     void printInfoStudent(bool fullInfo);
     void printInfoBase();
     student findStudent(int iter);
-    student findStudent(const char* name);
+    student findStudent(const char* lastname);
+
 
 private:
     StudentNode* iter = nullptr;

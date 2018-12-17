@@ -4,21 +4,21 @@
 #include <iostream>
 #include <string.h>
 
-
+const int sizeArray = 15;
 
 struct student {
 public:
-    student(const char* name, const char* secondname, const char* lastname, const char* birthday, const char* groupe);
+    student(int id, const char* name, const char* secondname, const char* lastname, const char* birthday, const char* groupe);
     ~student();
     void getInfo(bool fullInfo);
 
 
 private:
     int id;
-    char name[10] = "";
-    char secondname[10] = "";
-    char lastname[10] = "";
-    char groupe[10] = "";
+    char name[sizeArray] = "";
+    char secondname[sizeArray] = "";
+    char lastname[sizeArray] = "";
+    char groupe[sizeArray] = "";
     char birthday[10] = "";
 };
 
