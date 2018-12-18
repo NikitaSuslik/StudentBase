@@ -10,7 +10,12 @@ struct student {
 public:
     student(int id, const char* name, const char* secondname, const char* lastname, const char* birthday, const char* groupe);
     ~student();
-    void getInfo(bool fullInfo);
+    int getID();
+    char* getName();
+    char* getSecondName();
+    char* getLastName();
+    char* getGroupe();
+    char* getBirthDay();
 
 
 private:

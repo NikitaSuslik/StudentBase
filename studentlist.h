@@ -10,9 +10,10 @@ using namespace std;
 
 struct StudentNode {
 public:
-    student* data = nullptr;
-    student* nextStud = nullptr;
-    //student* prevStud = nullptr;
+    StudentNode();
+    student* studentData = nullptr;
+    StudentNode* nextStud = nullptr;
+    StudentNode* prevStud = nullptr;
 };
 
 struct StudentList
@@ -20,20 +21,24 @@ struct StudentList
 public:
     StudentList() {}
     ~StudentList();
-    bool addStudent();
+    bool empty();
+    void addStudent();
     bool saveBase();
     void changeSort();
     StudentList* loadBase();
     void printInfoStudent(bool fullInfo);
     void printInfoBase();
-    student findStudent(int iter);
-    student findStudent(const char* lastname);
+    StudentNode* findStudent(int iter);
+    StudentNode* findStudent(const char* lastname);
 
 
 private:
-    StudentNode* iter = nullptr;
-    StudentNode* head = nullptr;
+    
+    StudentNode* point = nullptr;
+    StudentNode* last = nullptr;
+    StudentNode* first = nullptr;
     int size = 0;
+    int iteration = 0;
     enum sorting {up, down};
     sorting sort = sorting::down;
 

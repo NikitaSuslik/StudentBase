@@ -1,7 +1,12 @@
 #include "studentlist.h"
 
 
-bool StudentList::addStudent()
+bool StudentList::empty()
+{
+    return last == nullptr || first == nullptr;
+}
+
+void StudentList::addStudent()
 {
     cout << "Print info about student:/nName ";
     char name[sizeArray];
@@ -15,11 +20,72 @@ bool StudentList::addStudent()
     cout << "\nGroupe: ";
     char groupe[sizeArray];
     cin >> groupe;
-    cout << "\nBirthday: ";
+    cout << "\nBirthday(format dd.mm.yyyy): ";
     char birthday[sizeArray];
     cin >> birthday;
-
-
+    iteration++;
+    size++;
     StudentNode* n = new StudentNode();
-    return true;
+    n->studentData = new student(iteration, (const char*) name, (const char*)secondname, (const char*)lastname, (const char*)birthday, (const char*) groupe);
+    if(empty()) {
+        first = last = n;
+        first->nextStud = last;
+        last->prevStud = first;
+    }
+    else {
+        StudentNode* FindStud = findStudent(lastname);
+        if(FindStud == last){
+            last->nextStud = n;
+            n->prevStud = last;
+            last = n;
+        }
+        else if (FindStud == nullptr) {
+            first->prevStud = n;
+            n->nextStud = first;
+            first = n;
+        }
+        else {
+            StudentNode* tmpStud = FindStud->nextStud;
+            FindStud->nextStud = n;
+            n->nextStud = tmpStud;
+            tmpStud->prevStud = n;
+            n->prevStud = FindStud;
+        }
+    }
 }
+
+bool StudentList::saveBase()
+{
+
+}
+
+void StudentList::changeSort()
+{
+    switch (sort) {
+    case sorting::up:
+        sort = sorting::down;
+        break;
+    case sorting::down:
+        sort = sorting::up;
+        break;
+    }
+}
+
+StudentNode* StudentList::findStudent(const char *lastname)
+{
+    if(empty()) return  nullptr;
+    else{
+        char* tmpLastName = point->studentData->getLastName();
+        if(strcmp(lastname, tmpLastName) < 0) return nullptr;
+        while(strcmp(lastname, tmpLastName) >= 0){
+            if(point == last) return last;
+            point = point->nextStud;
+            tmpLastName = point->studentData->getLastName();
+        }
+        return point;
+    }
+}
+
+
+
+
