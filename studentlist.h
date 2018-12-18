@@ -2,6 +2,7 @@
 #define STUDENTLIST_H
 
 #include <iostream>
+#include <fstream>
 
 
 #include "basestudent.h"

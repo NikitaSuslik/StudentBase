@@ -56,6 +56,16 @@ void StudentList::addStudent()
 
 bool StudentList::saveBase()
 {
+    ofstream oFile;
+    oFile.open("/Users/nikita/Desktop/Data.my",ios_base::binary | ios_base::trunc);
+    if(oFile.is_open()){
+        point = first;
+        while(point != nullptr){
+            oFile.write((const char*) point->studentData, sizeof (student));
+            point = point->nextStud;
+        }
+        oFile.close();
+    }
 
 }
 
