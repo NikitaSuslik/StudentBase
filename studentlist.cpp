@@ -32,22 +32,21 @@ void StudentList::addStudent()
     }
     else {
         StudentNode* FindStud = findStudent(lastname);
-        if(FindStud == last){
-            last->nextStud = n;
-            n->prevStud = last;
-            last = n;
-        }
-        else if (FindStud == nullptr) {
+        if (FindStud == nullptr) {
             first->prevStud = n;
             n->nextStud = first;
             first = n;
         }
+        else if(strcmp(lastname, FindStud->studentData->getLastName()) >= 0){
+            last->nextStud = n;
+            n->prevStud = last;
+            last = n;
+        }
         else {
-            StudentNode* tmpStud = FindStud->nextStud;
-            FindStud->nextStud = n;
-            n->nextStud = tmpStud;
-            tmpStud->prevStud = n;
-            n->prevStud = FindStud;
+            n->prevStud = FindStud->prevStud;
+            n->nextStud = FindStud;
+            FindStud->prevStud = n;
+            n->prevStud->nextStud = n;
         }
     }
 }
@@ -203,13 +202,13 @@ StudentNode* StudentList::findStudent(const char *lastname)
 {
     if(empty()) return  nullptr;
     else{
-        char* tmpLastName;
-        tmpLastName = point->studentData->getLastName();
+        point = first;
+        char* tmpLastName = point->studentData->getLastName();
         if(strcmp(lastname, tmpLastName) < 0) return nullptr;
         while(strcmp(lastname, tmpLastName) >= 0){
             if(point == last) return last;
             point = point->nextStud;
-            strcpy(tmpLastName, point->studentData->getLastName());
+            tmpLastName = point->studentData->getLastName();
         }
         return point;
     }
@@ -221,7 +220,10 @@ void StudentList::ShowMenu()
             "\"a\" - for adding student\n"
             "\"p\" - for printing base\n"
             "\"f\" - for find student\n"
-            "\"e\" - check is empty\n";
+            "\"e\" - check is empty\n"
+            "\"c\" - for change sorting\n"
+            "\"s\" - for save base\n"
+            "\"l\" - for load base\n";
 }
 
 void StudentList::Initialize()
@@ -229,8 +231,8 @@ void StudentList::Initialize()
     char command = 'h';
     while (true){
         ShowMenu();
+
         cin.get(command);
-        cin.get();
         switch (command) {
         case 'a':
             addStudent();
@@ -271,13 +273,13 @@ void StudentList::Initialize()
                 case 'p':
                     printInfoStudent(true);
                     cout << "Press any key for continue.\n";
-                    getchar();
+                    cin.get();
                     break;
                 case 'q':
                     break;
                 default:
                     cout << "Unknow command.\nTry again.\nPress any key for continue.\n";
-                    getchar();
+                    cin.get();
                     system("clear");
                     break;
                 }
@@ -285,15 +287,37 @@ void StudentList::Initialize()
             break;
         case 'q':
             return;
+        case 'c':
+            changeSort();
+            switch (sort) {
+            case StudentList::sorting::up:
+                cout << "Sort up\n";
+                break;
+            case StudentList::sorting::down:
+                cout << "Sort down\n";
+                cout << "Press any key for continue.\n";
+                cin.get();
+                break;
+            }
+            break;
         case 'e':
             if(empty()) cout << "Empty!\n";
             else cout << "Not empty!\n";
             cout << "Press any key for continue.\n";
-            getchar();
+            cin.get();
+            break;
+        case 's':
+            saveBase();
+            cout << "Not empty!\n";
+            cout << "Press any key for continue.\n";
+            cin.get();
+            break;
+        case 'l':
+            loadBase();
             break;
         default:
             cout << "Unkown commmand.\nTry again.\nPress any key for continue.\n";
-            getchar();
+            cin.get();
             break;
         }
         system("clear");

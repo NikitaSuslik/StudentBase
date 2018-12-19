@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include <istream>
 
 
 #include "basestudent.h"
