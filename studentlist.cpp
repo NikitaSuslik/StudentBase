@@ -80,33 +80,29 @@ void StudentList::deleteSudent()
 
 void StudentList::addStudent(student* stud)
 {
-    iteration++;
-    size++;
     StudentNode* n = new StudentNode;
     n->studentData = stud;
+    char* lastname = stud->getLastName();
     if(empty()) {
         first = last = n;
-        first->nextStud = last;
-        last->prevStud = first;
     }
     else {
-        StudentNode* FindStud = findStudent(stud ->getLastName());
-        if(FindStud == last){
-            last->nextStud = n;
-            n->prevStud = last;
-            last = n;
-        }
-        else if (FindStud == nullptr) {
+        StudentNode* FindStud = findStudent(lastname);
+        if (FindStud == nullptr) {
             first->prevStud = n;
             n->nextStud = first;
             first = n;
         }
+        else if(strcmp(lastname, FindStud->studentData->getLastName()) >= 0){
+            last->nextStud = n;
+            n->prevStud = last;
+            last = n;
+        }
         else {
-            StudentNode* tmpStud = FindStud->nextStud;
-            FindStud->nextStud = n;
-            n->nextStud = tmpStud;
-            tmpStud->prevStud = n;
-            n->prevStud = FindStud;
+            n->prevStud = FindStud->prevStud;
+            n->nextStud = FindStud;
+            FindStud->prevStud = n;
+            n->prevStud->nextStud = n;
         }
     }
 }
@@ -116,17 +112,21 @@ void StudentList::addStudent(student* stud)
 bool StudentList::saveBase()
 {
     ofstream oFile;
-    oFile.open("/Users/nikita/Desktop/Data.my",ios_base::binary | ios_base::trunc);
+    oFile.open("/Users/nikita/Desktop/Data.my", ios_base::trunc | ios_base::binary);
     if(oFile.is_open()){
         oFile.write((const char*)&iteration,sizeof (int));
         point = first;
         while(point != nullptr){
-            oFile.write((const char*) point->studentData, sizeof (student));
+            oFile.write((const char*)point->studentData, sizeof (student));
             point = point->nextStud;
         }
         oFile.close();
+        return true;
     }
-    return true;
+    else {
+        return false;
+    }
+
 }
 
 void StudentList::changeSort()
@@ -147,10 +147,25 @@ bool StudentList::loadBase()
     iFile.open("/Users/nikita/Desktop/Data.my", ios_base::binary);
     if(iFile.is_open()){
         iFile.read((char*)&iteration,sizeof (int));
-        while(iFile.eof()){
-            student* tmpStudent;
-            iFile.read((char*)&tmpStudent, sizeof (student));
-            addStudent(tmpStudent);
+        while(!iFile.eof()){
+
+            int id = 0;
+            char name[sizeArray] = {0};
+            char lastname[sizeArray] = {0};
+            char secondname[sizeArray] = {0};
+            char groupe[sizeArray] = {0};
+            char birthday[11] = {0};
+
+            iFile.read((char*)&id, sizeof(int));
+            iFile.read(name, sizeof(char)*sizeArray);
+            iFile.read(lastname, sizeof(char)*sizeArray);
+            iFile.read(secondname, sizeof(char)*sizeArray);
+            iFile.read(groupe, sizeof(char)*sizeArray);
+            iFile.read(birthday, sizeof(char)*12);
+            if(!iFile.eof()){
+                student* tmpStudent = new student(id, name, secondname, lastname, birthday, groupe);
+                addStudent(tmpStudent);
+            }
         }
         iFile.close();
         return true;
@@ -161,8 +176,8 @@ bool StudentList::loadBase()
 void StudentList::printInfoStudent(bool fullInfo)
 {
     if(fullInfo){
-        cout << "Lastname: " << point->studentData->getLastName() << " "
-             << point->studentData->getName()
+        cout << "Student: " << point->studentData->getLastName() << " "
+             << point->studentData->getName() << " "
              << point->studentData->getSecondName() << "\n"
              <<"ID " << point->studentData->getID() << "\n"
              "Birtday " << point->studentData->getBirthDay() <<"\n"
@@ -176,12 +191,24 @@ void StudentList::printInfoStudent(bool fullInfo)
 void StudentList::printInfoBase()
 {
     int iter = 1;
+    char ans;
+    while(1){
+        cout << "Would you like see full info?(\"y\" - yes, \"n\" - no)\n";
+        cin >> ans;
+        cin.ignore(100,'\n');
+        if(ans == 'y' || ans == 'n'){
+            break;
+        }
+    }
     switch (sort) {
     case StudentList::sorting::up:
         point = first;
         while (point != nullptr){
-            cout << "\n" << iter << " ################################# " << iter << "\n";
-            printInfoStudent();
+            cout << "\n\n" << iter << " ################################# " << iter << "\n";
+            if(ans == 'y')
+                printInfoStudent(true);
+            else
+                printInfoStudent();
             point = point->nextStud;
             iter++;
         }
@@ -190,7 +217,10 @@ void StudentList::printInfoBase()
         point = last;
         while (point != nullptr){
             cout << "\n" << iter << " ################################# " << iter << "\n";
-            printInfoStudent();
+            if(ans == 'y')
+                printInfoStudent(true);
+            else
+                printInfoStudent();
             point = point->prevStud;
             iter++;
         }
@@ -205,7 +235,7 @@ StudentNode* StudentList::findStudent(const char *lastname)
         point = first;
         char* tmpLastName = point->studentData->getLastName();
         if(strcmp(lastname, tmpLastName) < 0) return nullptr;
-        while(strcmp(lastname, tmpLastName) >= 0){
+        while(strcmp(lastname, tmpLastName) > 0){
             if(point == last) return last;
             point = point->nextStud;
             tmpLastName = point->studentData->getLastName();
@@ -231,30 +261,42 @@ void StudentList::Initialize()
     char command = 'h';
     while (true){
         ShowMenu();
-
-        cin.get(command);
+        cin >> command;
+        cin.ignore(100,'\n');
         switch (command) {
         case 'a':
             addStudent();
+            cout << "Student is create!\n";
+            cin.get();
             break;
         case 'p':
             if(empty()){
                 cout << "Base is empty!";
+                cin.get();
                 break;
             }
             printInfoBase();
-            cout << "Press any key for quit\n";
-            getchar();
+            cout << "\nPress any key for quit\n";
+            cin.get();
             break;
         case 'f':
+            if(empty()){
+                cout << "Base is empty!";
+                cin.get();
+                break;
+            }
             char tmpLastName[sizeArray];
             cout << "Input Lastname for searching: ";
             cin >> tmpLastName;
+            cin.ignore(100,'\n');
             cout << '\n';
             findStudent(tmpLastName);
             if(point != nullptr)
-                if(strcmp(tmpLastName, point->studentData->getLastName()) != 0)
+                if(strcmp(tmpLastName, point->studentData->getLastName()) != 0){
+                    cout << "Student not found!\nPress any key for continue.\n";
+                    cin.get();
                     break;
+                }
             while (command != 'q') {
                 cout << "Find student:\n";
                 printInfoStudent();
@@ -263,7 +305,7 @@ void StudentList::Initialize()
                         "\"p\" - print full info\n"
                         "\"q\" - qiut\n";
                 cin.get(command);
-                cin.get();
+                cin.ignore(100,'\n');
                 switch (command) {
                 case 'd':
                     deleteSudent();
@@ -307,16 +349,27 @@ void StudentList::Initialize()
             cin.get();
             break;
         case 's':
-            saveBase();
-            cout << "Not empty!\n";
-            cout << "Press any key for continue.\n";
-            cin.get();
+            if(saveBase()){
+                cout << "Base is saved!\nPress any key for continue.\n";
+                cin.get();
+            }
+            else {
+                cout << "Error save!\nPress any key for continue.\n";
+                cin.get();
+            }
             break;
         case 'l':
-            loadBase();
+            if(loadBase()){
+                cout << "Base is loaded!\nPress any key for continue.\n";
+                cin.get();
+            }
+            else {
+                cout << "Error load!\nPress any key for continue.\n";
+                cin.get();
+            }
             break;
         default:
-            cout << "Unkown commmand.\nTry again.\nPress any key for continue.\n";
+            cout << "Unkown commmand" << command << ".\nTry again.\nPress any key for continue.\n";
             cin.get();
             break;
         }

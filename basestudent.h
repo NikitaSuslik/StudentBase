@@ -24,7 +24,7 @@ private:
     char secondname[sizeArray] = "";
     char lastname[sizeArray] = "";
     char groupe[sizeArray] = "";
-    char birthday[10] = "";
+    char birthday[11] = "";
 };
 
 
