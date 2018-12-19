@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
 
 
 #include "basestudent.h"
@@ -11,7 +12,6 @@ using namespace std;
 
 struct StudentNode {
 public:
-    StudentNode();
     student* studentData = nullptr;
     StudentNode* nextStud = nullptr;
     StudentNode* prevStud = nullptr;
@@ -20,21 +20,27 @@ public:
 struct StudentList
 {
 public:
+    //open
+
+    //system
     StudentList() {}
     ~StudentList();
     bool empty();
     void addStudent();
+    void deleteSudent();
     bool saveBase();
     void changeSort();
-    StudentList* loadBase();
-    void printInfoStudent(bool fullInfo);
+    bool loadBase();
+    void printInfoStudent(bool fullInfo = false);
     void printInfoBase();
-    StudentNode* findStudent(int iter);
     StudentNode* findStudent(const char* lastname);
+    //Interface
+    void ShowMenu();
+    void Initialize();
 
 
 private:
-    
+    //Data
     StudentNode* point = nullptr;
     StudentNode* last = nullptr;
     StudentNode* first = nullptr;
@@ -42,6 +48,10 @@ private:
     int iteration = 0;
     enum sorting {up, down};
     sorting sort = sorting::down;
+
+    //Functions
+
+    void addStudent(student*);
 
 };
 
