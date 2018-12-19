@@ -3,12 +3,12 @@
 
 bool StudentList::empty()
 {
-    return last == nullptr || first == nullptr;
+    return first == nullptr;
 }
 
 void StudentList::addStudent()
 {
-    cout << "Print info about student:/nName ";
+    cout << "Print info about student:\nName ";
     char name[sizeArray];
     cin >> name;
     cout << "\nLastname: ";
@@ -29,8 +29,6 @@ void StudentList::addStudent()
     n->studentData = new student(iteration, (const char*) name, (const char*)secondname, (const char*)lastname, (const char*)birthday, (const char*) groupe);
     if(empty()) {
         first = last = n;
-        first->nextStud = last;
-        last->prevStud = first;
     }
     else {
         StudentNode* FindStud = findStudent(lastname);
@@ -56,12 +54,29 @@ void StudentList::addStudent()
 
 void StudentList::deleteSudent()
 {
-    StudentNode* tmpNext = point->nextStud;
-    StudentNode* tmpPrev = point->prevStud;
-    delete point;
-    point = nullptr;
-    tmpNext->prevStud = tmpPrev;
-    tmpPrev->nextStud = tmpNext;
+    if(point == last) {
+        last = point->prevStud;
+        last->nextStud = nullptr;
+        delete point;
+    }
+    else if(point == first){
+        first = point->nextStud;
+        first->prevStud = nullptr;
+        delete point;
+    }
+    else if(first == last){
+        delete point;
+        first = last = nullptr;
+    }
+    else {
+        StudentNode* tmpNext = point->nextStud;
+        StudentNode* tmpPrev = point->prevStud;
+        delete point;
+        point = nullptr;
+        tmpNext->prevStud = tmpPrev;
+        tmpPrev->nextStud = tmpNext;
+    }
+    size--;
 }
 
 void StudentList::addStudent(student* stud)
@@ -161,13 +176,26 @@ void StudentList::printInfoStudent(bool fullInfo)
 
 void StudentList::printInfoBase()
 {
-    point = first;
     int iter = 1;
-    while (point != nullptr){
-        cout << "\n" << iter << " ################################# " << iter << "\n";
-        printInfoStudent();
-        point = point->nextStud;
-        iter++;
+    switch (sort) {
+    case StudentList::sorting::up:
+        point = first;
+        while (point != nullptr){
+            cout << "\n" << iter << " ################################# " << iter << "\n";
+            printInfoStudent();
+            point = point->nextStud;
+            iter++;
+        }
+        break;
+    case StudentList::sorting::down:
+        point = last;
+        while (point != nullptr){
+            cout << "\n" << iter << " ################################# " << iter << "\n";
+            printInfoStudent();
+            point = point->prevStud;
+            iter++;
+        }
+        break;
     }
 }
 
@@ -175,12 +203,13 @@ StudentNode* StudentList::findStudent(const char *lastname)
 {
     if(empty()) return  nullptr;
     else{
-        char* tmpLastName = point->studentData->getLastName();
+        char* tmpLastName;
+        tmpLastName = point->studentData->getLastName();
         if(strcmp(lastname, tmpLastName) < 0) return nullptr;
         while(strcmp(lastname, tmpLastName) >= 0){
             if(point == last) return last;
             point = point->nextStud;
-            tmpLastName = point->studentData->getLastName();
+            strcpy(tmpLastName, point->studentData->getLastName());
         }
         return point;
     }
@@ -201,7 +230,7 @@ void StudentList::Initialize()
     while (true){
         ShowMenu();
         cin.get(command);
-        cin.clear();
+        cin.get();
         switch (command) {
         case 'a':
             addStudent();
@@ -232,7 +261,7 @@ void StudentList::Initialize()
                         "\"p\" - print full info\n"
                         "\"q\" - qiut\n";
                 cin.get(command);
-                cin.clear();
+                cin.get();
                 switch (command) {
                 case 'd':
                     deleteSudent();

@@ -47,7 +47,7 @@ private:
     int size = 0;
     int iteration = 0;
     enum sorting {up, down};
-    sorting sort = sorting::down;
+    sorting sort = sorting::up;
 
     //Functions
 
