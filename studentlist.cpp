@@ -8,7 +8,7 @@ bool StudentList::empty()
 
 void StudentList::addStudent()
 {
-    cout << "Print info about student:\nName ";
+    cout << "Print info about student:\nName: ";
     char name[sizeArray];
     cin >> name;
     cout << "\nLastname: ";
@@ -87,18 +87,19 @@ void StudentList::addStudent(student* stud)
         first = last = n;
     }
     else {
-        StudentNode* FindStud = findStudent(lastname);
-        if (FindStud == nullptr) {
+
+        if (strcmp(lastname, first->studentData->getLastName()) <= 0) {
             first->prevStud = n;
             n->nextStud = first;
             first = n;
         }
-        else if(strcmp(lastname, FindStud->studentData->getLastName()) >= 0){
+        else if(strcmp(last->studentData->getLastName(), lastname) <= 0){
             last->nextStud = n;
             n->prevStud = last;
             last = n;
         }
         else {
+            StudentNode* FindStud = findStudent(lastname);
             n->prevStud = FindStud->prevStud;
             n->nextStud = FindStud;
             FindStud->prevStud = n;
@@ -158,8 +159,8 @@ bool StudentList::loadBase()
 
             iFile.read((char*)&id, sizeof(int));
             iFile.read(name, sizeof(char)*sizeArray);
-            iFile.read(lastname, sizeof(char)*sizeArray);
             iFile.read(secondname, sizeof(char)*sizeArray);
+            iFile.read(lastname, sizeof(char)*sizeArray);
             iFile.read(groupe, sizeof(char)*sizeArray);
             iFile.read(birthday, sizeof(char)*12);
             if(!iFile.eof()){
@@ -181,7 +182,7 @@ void StudentList::printInfoStudent(bool fullInfo)
              << point->studentData->getSecondName() << "\n"
              <<"ID " << point->studentData->getID() << "\n"
              "Birtday " << point->studentData->getBirthDay() <<"\n"
-             "Groupe " << point->studentData->getBirthDay() << "\n";
+             "Groupe " << point->studentData->getGroupe() << "\n";
     }
     else {
         cout << point->studentData->getLastName() << " " << point->studentData->getName() <<"\n";
@@ -253,7 +254,8 @@ void StudentList::ShowMenu()
             "\"e\" - check is empty\n"
             "\"c\" - for change sorting\n"
             "\"s\" - for save base\n"
-            "\"l\" - for load base\n";
+            "\"l\" - for load base\n"
+            "\"q\" - for quit\n";
 }
 
 void StudentList::Initialize()
